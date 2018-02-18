@@ -2,6 +2,31 @@
 
 Command line utility to build and serialize a json dataset.
 
+# Getting Started
+
+Setup your go development environment [Go install](https://golang.org/doc/install)
+* Create a working directory {workingdir}
+* Set your $GOPATH environment variable to {workingdir}
+* GO is very opinionated and requires the directory structure 
+    * {workingdir}/src
+    * {workingdir}/bin
+    * {workingdir}/src/github.com/harshc
+* [Install Glide](http://glide.sh/) the package manager for Go
+    
+If you just want the binary. This will pull the binary into $GOPATH\bin
+```
+    $ go get -u github.com/harshc/indexconstructor
+```     
+
+If you want the whole enchilada
+```
+    $ cd {workingdir}/src/github.com/harshc 
+    $ git clone http://github.com/harshc/indexconstructor
+    $ cd indexconstructor
+    $ glide install
+    $ go build
+```
+
 # Usage
 
 This tool has a built in Help function
