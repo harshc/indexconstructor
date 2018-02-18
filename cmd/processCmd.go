@@ -73,7 +73,7 @@ func decodeAndStreamJson(decoder *json.Decoder, encoder *json.Encoder, pipeWrite
 			err := encoder.Encode(&names)
 			log.WithFields(log.Fields{
 				"names": names,
-			}).Infoln("Encoded names")
+			}).Debugln("Encoded names")
 
 			if err != nil {
 				log.WithFields(log.Fields{
