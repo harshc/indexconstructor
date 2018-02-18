@@ -19,9 +19,11 @@
 // THE SOFTWARE.
 package main
 
-import "fmt"
-var version = "v0.0.1"
+import (
+	"github.com/harshc/indexconstructor/cmd"
+)
 
+const version = "0.0.1"
 func main() {
-	fmt.Println("Hello World!")
+	cmd.Execute(version)
 }
