@@ -7,6 +7,7 @@ import (
 	"os"
 	"github.com/harshc/indexconstructor/globals"
 	"io"
+	"net/http"
 )
 
 var infile string
@@ -19,14 +20,16 @@ var processCmd = &cobra.Command {
 	Long: "Process the json file and stream the serialized json to an API endpoint",
 	Run: func(cmd *cobra.Command, args []string) {
 		pr, pw := io.Pipe()
-		go SerializeJson(infile, apiUrl, pw, pr, callHTTPEndpoint)
+		log.WithFields(log.Fields{
+			"fileName": infile,
+		}).Infoln("Start file processing")
+		SerializeJson(infile, apiUrl, pw, pr, callHTTPEndpoint)
 	},
 }
 
 // SerializeJson ...
 func SerializeJson(fileName string, url string, pipeWriter *io.PipeWriter, pipeReader *io.PipeReader, httpCaller HttpPOST) {
-	log.Debugln("Starting to SerializeJSON")
-
+	log.Infoln("Starting to SerializeJSON")
 	file, err := os.Open(fileName)
 	log.WithFields(log.Fields{
 		"file": fileName,
@@ -46,7 +49,9 @@ func SerializeJson(fileName string, url string, pipeWriter *io.PipeWriter, pipeR
 	encoder := json.NewEncoder(pipeWriter)
 	decodeAndStreamJson(decoder, encoder, pipeWriter)
 	// we can concurrently post to the HTTP endpoint
-	httpCaller(url, pipeReader)
+	if url != "" {
+		httpCaller(url, pipeReader)
+	}
 }
 
 func decodeAndStreamJson(decoder *json.Decoder, encoder *json.Encoder, pipeWriter *io.PipeWriter) {
@@ -68,7 +73,7 @@ func decodeAndStreamJson(decoder *json.Decoder, encoder *json.Encoder, pipeWrite
 			err := encoder.Encode(&names)
 			log.WithFields(log.Fields{
 				"names": names,
-			}).Debugln("Encoded names")
+			}).Infoln("Encoded names")
 
 			if err != nil {
 				log.WithFields(log.Fields{
@@ -78,12 +83,25 @@ func decodeAndStreamJson(decoder *json.Decoder, encoder *json.Encoder, pipeWrite
 				}).Errorln("Error encoding value to json stream")
 			}
 		}()
-		log.Infoln("Done sending the encoded stream over the wire")
+		log.WithFields(log.Fields{
+			"rows": len(names),
+		}).Infoln("Done sending the encoded stream over the wire")
 	}
 }
 
 func callHTTPEndpoint(canonicalurl string, pipeReader *io.PipeReader) {
- // do nothing here
+	response, err := http.Post(canonicalurl, "application/json", pipeReader)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"error": err,
+			"url": canonicalurl,
+		}).Errorln("Error sending HTTP post request")
+	}
+
+	log.WithFields(log.Fields{
+		"status": response.Status,
+		"statusCode": response.StatusCode,
+	}).Infoln("HTTP Post request sent")
 }
 
 func init() {
