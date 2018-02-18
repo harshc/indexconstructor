@@ -3,10 +3,7 @@ package cmd
 import (
 	"os"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 	log "github.com/Sirupsen/logrus"
-	"io/ioutil"
-	"bytes"
 )
 
 const configDirName = ".indexconstructor"
@@ -36,18 +33,5 @@ func Execute(ver string){
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
 	// define flags
-}
-
-func initConfig() {
-	viper.SetConfigType("yaml")
-	buff, err := ioutil.ReadFile("mock_dataset.yaml")
-	if err != nil {
-		log.WithFields(log.Fields{
-			"error": err,
-			"filepath": cfgFile,
-		}).Fatalln("Error reading config file")
-	}
-	viper.ReadConfig(bytes.NewBuffer(buff))
 }

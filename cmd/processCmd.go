@@ -10,16 +10,16 @@ import (
 )
 
 var infile string
-
+var apiUrl string
 type HttpPOST func(url string, pipeReader *io.PipeReader)
 
 var processCmd = &cobra.Command {
 	Use: "process",
 	Short: "Process a json file and generate a serialized data structure",
-	Long: "Process the json file and generate the serialized stream to a file",
+	Long: "Process the json file and stream the serialized json to an API endpoint",
 	Run: func(cmd *cobra.Command, args []string) {
 		pr, pw := io.Pipe()
-		go SerializeJson(infile, "", pw, pr, callHTTPEndpoint)
+		go SerializeJson(infile, apiUrl, pw, pr, callHTTPEndpoint)
 	},
 }
 
@@ -88,5 +88,6 @@ func callHTTPEndpoint(canonicalurl string, pipeReader *io.PipeReader) {
 
 func init() {
 	rootCmd.AddCommand(processCmd)
-	processCmd.Flags().StringVarP(&infile, "infile", "i", "mockdataset.json", "Input file with the dataset")
+	processCmd.Flags().StringVarP(&infile, "input", "f", "dataset.json", "Input file with the dataset")
+	processCmd.Flags().StringVarP(&apiUrl, "url", "u", "", "API Url to invoke with the json streaming payload")
 }

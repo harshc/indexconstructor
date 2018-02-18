@@ -1,6 +1,6 @@
 package globals
 
 type ScoredName struct {
-	Name string
-	Score int
+	Name string `json:"name"`
+	Score int `json:"score"`
 }
